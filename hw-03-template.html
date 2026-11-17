@@ -444,12 +444,41 @@ email hours.</p>
 <h2>Exercise 2: Compare two linear models</h2>
 <div id="exercise-2-a" class="section level4">
 <h4>Exercise 2 (a)</h4>
-<pre class="r"><code># replace this with your code</code></pre>
-</div>
-<div id="exercise-2-b" class="section level4">
-<h4>Exercise 2 (b)</h4>
-<pre class="r"><code># replace this with your code</code></pre>
-<p><em>Your answer here</em></p>
+<pre class="r"><code># Add research support as a predictor.
+email_model_2 &lt;- linear_reg() %&gt;%
+  set_engine(&quot;lm&quot;) %&gt;%
+  fit(emailhr ~ educ + advfront, data = gss16_advfront)
+
+tidy(email_model_2)</code></pre>
+<pre><code>## # A tibble: 3 × 5
+##   term          estimate std.error statistic       p.value
+##   &lt;chr&gt;            &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+## 1 (Intercept)     -3.06      1.76     -1.74  0.0820       
+## 2 educ             0.678     0.117     5.80  0.00000000830
+## 3 advfrontAgree    0.481     0.918     0.524 0.601</code></pre>
+<p>For people with the same number of years of education, the model
+predicts that those who agree with government support for scientific
+research spend about 0.48 hours more per week on email than those in the
+Not agree group. The p-value is about 0.60, so the model provides little
+evidence of a difference between two groups. #### Exercise 2 (b)</p>
+<pre class="r"><code># Compare the two model fits.
+glance(email_model)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic       p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1    0.0291        0.0283  10.9      35.1 0.00000000413     1 -4458. 8922. 8937.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<pre class="r"><code>glance(email_model_2)</code></pre>
+<pre><code>## # A tibble: 1 × 12
+##   r.squared adj.r.squared sigma statistic      p.value    df logLik   AIC   BIC
+##       &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;        &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1    0.0293        0.0277  10.9      17.7 0.0000000275     2 -4458. 8923. 8944.
+## # ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+<p>Both models explain about 2.9% of the variation in weekly email
+hours. Adding <code>advfront</code> increases R^2 slightly, but adjusted
+R^2 falls from 0.02829 to 0.02769. Since adjusted R^2 accounts for the
+extra predictor, I would prefer the simpler model with education
+alone.</p>
 </div>
 </div>
 <div id="exercise-3-create-a-workflow-to-fit-a-model" class="section level2">

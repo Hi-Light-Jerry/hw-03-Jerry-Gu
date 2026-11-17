@@ -104,17 +104,24 @@ The model explains about 2.9% of the variation in weekly email hours, and the re
 #### Exercise 2 (a)
 
 ```{r}
-# replace this with your code
-```
+# Add research support as a predictor.
+email_model_2 <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(emailhr ~ educ + advfront, data = gss16_advfront)
 
+tidy(email_model_2)
+```
+For people with the same number of years of education, the model predicts that those who agree with government support for scientific research spend about 0.48 hours more per week on email than those in the Not agree group. The p-value is about 0.60, so the model provides little evidence of a difference between two groups.
 #### Exercise 2 (b)
 
 ```{r}
-# replace this with your code
+# Compare the two model fits.
+glance(email_model)
+glance(email_model_2)
 ```
 
 
-*Your answer here*
+Both models explain about 2.9% of the variation in weekly email hours. Adding `advfront` increases R^2 slightly, but adjusted R^2 falls from 0.02829 to 0.02769. Since adjusted R^2 accounts for the extra predictor, I would prefer the simpler model with education alone.
 
 ## Exercise 3: Create a workflow to fit a model
 
