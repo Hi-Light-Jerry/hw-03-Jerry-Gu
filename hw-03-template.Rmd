@@ -135,18 +135,44 @@ gss16_test  <- testing(gss16_split)
 #### Exercise 3 (a)
 
 ```{r}
-# replace this with your code
+# Set up the logistic regression workflow.
+gss16_rec_1 <- recipe(advfront ~ educ, data = gss16_train)
+
+gss16_mod_1 <- logistic_reg() %>%
+  set_engine("glm")
+
+gss16_wflow_1 <- workflow() %>%
+  add_model(gss16_mod_1) %>%
+  add_recipe(gss16_rec_1)
+
+gss16_wflow_1
 ```
 
-*Your answer here*
+I chose logistic regression because `advfront` has two categories, Agree and Not agree. The model uses years of education to estimate the probability of an Agree response.
 
 #### Exercise 3 (b)
 
 ```{r}
-# replace this with your code
+# Fit the model on the training data.
+gss16_fit_1 <- gss16_wflow_1 %>%
+  fit(data = gss16_train)
+
+# Predict probabilities on the test data.
+gss16_pred_1 <- predict(gss16_fit_1, gss16_test, type = "prob") %>%
+  bind_cols(gss16_test)
+
+# Plot the ROC curve for Agree.
+gss16_pred_1 %>%
+  roc_curve(
+    truth = advfront,
+    .pred_Agree,
+    event_level = "second"
+  ) %>%
+  autoplot() +
+  labs(title = "ROC curve for the education model")
 ```
 
-*Your answer here*
+The ROC curve is mostly above the diagonal, but it stays fairly close to it. This suggests that years of education alone has limited ability to distinguish between Agree and Not agree responses in the test data.
 
 ## Exercise 4: Performance of a logistic regression
 
