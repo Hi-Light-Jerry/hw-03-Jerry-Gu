@@ -179,17 +179,61 @@ The ROC curve is mostly above the diagonal, but it stays fairly close to it. Thi
 #### Exercise 4 (a)
 
 ```{r}
-# replace this with your code
+# Classify test responses and count the outcomes.
+gss16_pred_1 %>%
+  mutate(predicted = if_else(.pred_Agree >= 0.83, "Agree", "Not agree")) %>%
+  summarise(
+    TP = sum(predicted == "Agree" & advfront == "Agree"),
+    TN = sum(predicted == "Not agree" & advfront == "Not agree"),
+    FP = sum(predicted == "Agree" & advfront == "Not agree"),
+    FN = sum(predicted == "Not agree" & advfront == "Agree")
+  ) %>%
+  mutate(
+    sensitivity = TP / (TP + FN),
+    specificity = TN / (TN + FP)
+  )
 ```
 
-*Your answer here*
+At the 0.83 cutoff, the model correctly identifies 147 of the 265 Agree responses, giving a sensitivity of 55.5%. It also correctly identifies 18 of the 28 Not agree responses, giving a specificity of 64.3%.
 
 #### Exercise 4 (b)
 
 ```{r}
-# replace this with your code
+# Set up the model with four predictors.
+gss16_rec_2 <- recipe(
+  advfront ~ polviews + wrkstat + emailhr + educ,
+  data = gss16_train
+) %>%
+  step_dummy(all_nominal(), -all_outcomes())
+
+gss16_mod_2 <- logistic_reg() %>%
+  set_engine("glm")
+
+gss16_wflow_2 <- workflow() %>%
+  add_model(gss16_mod_2) %>%
+  add_recipe(gss16_rec_2)
+
+# Fit model 2 and predict on the test data.
+gss16_fit_2 <- gss16_wflow_2 %>%
+  fit(data = gss16_train)
+
+gss16_pred_2 <- predict(gss16_fit_2, gss16_test, type = "prob") %>%
+  bind_cols(gss16_test)
+
+# Plot the ROC curve for model 2.
+gss16_pred_2 %>%
+  roc_curve(truth = advfront, .pred_Agree, event_level = "second") %>%
+  autoplot() +
+  labs(title = "ROC curve for the model with four predictors")
+
+# Compare test AUC for models 1 and 2.
+gss16_pred_1 %>%
+  roc_auc(truth = advfront, .pred_Agree, event_level = "second")
+
+gss16_pred_2 %>%
+  roc_auc(truth = advfront, .pred_Agree, event_level = "second")
 ```
 
-*Your answer here*
+On the same test set, the model using only years of education had an AUC of 0.581, compared with 0.535 for the model with four predictors. The education model performed slightly better, but both AUC values are close to 0.5. This suggests that both models have limited ability to distinguish between Agree and Not agree responses.
 
 
