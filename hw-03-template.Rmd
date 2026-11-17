@@ -1,6 +1,6 @@
 ---
 title: "hw-03"
-author: "Your Name (S000000)"
+author: "Jerry Gu (S2785099)"
 date: "`r Sys.Date()`"
 output: html_document
 ---
@@ -62,18 +62,42 @@ gss16_advfront <- gss16_advfront %>%
 #### Exercise 1 (a)
 
 ```{r}
-# replace this with your code
+# Predict weekly email hours from years of education.
+email_model <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(emailhr ~ educ, data = gss16_advfront)
+
+tidy(email_model)
 ```
 
-*Your answer here*
+Therefore the fitted line is:
+
+$$
+\widehat{\text{emailhr}} = -2.757 + 0.685\,\text{educ}.
+$$
+
+For each additional year of education, the model predicts about 0.685 more hours spent on email per week.
 
 #### Exercise 1 (b)
 
 ```{r}
-# replace this with your code
+# Summarise the model fit.
+glance(email_model)
+
+# Plot residuals against fitted values.
+email_residuals <- augment(email_model$fit)
+
+ggplot(email_residuals, aes(x = .fitted, y = .resid)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(yintercept = 0, color = "gray", lty = "dashed") +
+  labs(
+    title = "Residuals versus fitted values",
+    x = "Predicted weekly email hours",
+    y = "Residual (hours)"
+  )
 ```
 
-*Your answer here*
+The model explains about 2.9% of the variation in weekly email hours, and the residual standard error is about 10.9 hours. The residual plot shows several large positive residuals, including one of about 83 hours. Overall, years of education alone does a poor job of predicting weekly email hours.
 
 ## Exercise 2: Compare two linear models
 
